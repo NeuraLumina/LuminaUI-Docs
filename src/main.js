@@ -332,7 +332,7 @@ function TopBar() {
       ]),
       Row({ gap: 10, style: { alignItems: "center", flexWrap: "wrap" } }, [
         LinkButton({ href: "https://www.npmjs.com/package/@chimuka_amel/lumina-ui", label: "npm", variant: "secondary" }),
-        LinkButton({ href: "https://github.com/chimuka-amel/lumina-ui", label: "GitHub", variant: "primary" }),
+        LinkButton({ href: "https://github.com/AmelCMM/LuminaVite", label: "GitHub", variant: "primary" }),
       ]),
     ]),
   ]);
