@@ -1,49 +1,36 @@
-Here's your **detailed README.md** focused on using LuminaUI with Vite:
-
----
-
-```markdown
 # LuminaUI + Vite
 
-A complete starter template for building apps with LuminaUI and Vite. Zero configuration, instant hot reload, and a full component library ready to use.
+A starter template for building apps with LuminaUI and Vite. Hot reload, zero config, and the full widget library ready to go.
 
-## Quick Start
-
-Create a new project in one command:
+## Quick start
 
 ```bash
 npm create vite@latest my-app -- --template vanilla
 cd my-app
 npm install @chimuka_amel/lumina-ui
-```
-
-Replace the boilerplate files with the examples below, then:
-
-```bash
 npm run dev
 ```
 
-Open `http://localhost:5173` — your LuminaUI app is running.
+Open `http://localhost:5173`. That's it.
 
 ---
 
-## Project Structure
+## Project structure
 
 ```text
 my-app/
 ├── index.html
 ├── package.json
-├── src/
-│   ├── main.js
-│   └── style.css
-└── node_modules/
+└── src/
+    ├── main.js
+    └── style.css
 ```
 
-That's it. No extra config files. No bundler setup. Vite just works.
+No extra config files. Vite picks up LuminaUI's ES modules without any setup.
 
 ---
 
-## The Minimal Setup
+## Minimal setup
 
 ### `index.html`
 
@@ -55,15 +42,8 @@ That's it. No extra config files. No bundler setup. Vite just works.
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LuminaUI + Vite</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: system-ui, -apple-system, Inter, sans-serif;
-        background: #f5f7fa;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, Inter, sans-serif; background: #f5f7fa; }
     </style>
   </head>
   <body>
@@ -96,25 +76,16 @@ function App(forceUpdate) {
 mount(App, document.getElementById("app"));
 ```
 
-### Run it
-
-```bash
-npm run dev
-```
-
 ---
 
-## Complete Example
+## A more complete example
 
-A more realistic app with forms, cards, and state management.
-
-### `src/main.js`
+Forms, cards, and state — closer to a real app.
 
 ```js
 import {
   mount,
   Column,
-  Row,
   Container,
   Text,
   Button,
@@ -125,7 +96,6 @@ import {
   useState,
 } from "@chimuka_amel/lumina-ui";
 
-// State
 const [name, setName, subscribeName] = useState("");
 const [email, setEmail, subscribeEmail] = useState("");
 const [submitted, setSubmitted, subscribeSubmitted] = useState(false);
@@ -151,13 +121,9 @@ function App(forceUpdate) {
           Text(`Email: ${email()}`, { weight: 500 }),
           Divider(),
           Button({
-            text: "Start Over",
+            text: "Start over",
             variant: "secondary",
-            onClick: () => {
-              setName("");
-              setEmail("");
-              setSubmitted(false);
-            },
+            onClick: () => { setName(""); setEmail(""); setSubmitted(false); },
           }),
         ]),
       ]),
@@ -168,27 +134,12 @@ function App(forceUpdate) {
     Card({ padding: 32, elevation: 2 }, [
       Column({ gap: 24, style: { maxWidth: 480, margin: "0 auto" } }, [
         Heading({ level: 1 }, "LuminaUI + Vite"),
-        Text("A complete UI framework with zero dependencies", {
-          color: "#6b7280",
-        }),
+        Text("A UI framework with zero dependencies", { color: "#6b7280" }),
         Divider(),
         Column({ gap: 16 }, [
-          TextField({
-            placeholder: "Your name",
-            value: name(),
-            onChange: setName,
-          }),
-          TextField({
-            placeholder: "Your email",
-            type: "email",
-            value: email(),
-            onChange: setEmail,
-          }),
-          Button({
-            text: "Submit",
-            onClick: () => setSubmitted(true),
-            variant: "primary",
-          }),
+          TextField({ placeholder: "Your name", value: name(), onChange: setName }),
+          TextField({ placeholder: "Your email", type: "email", value: email(), onChange: setEmail }),
+          Button({ text: "Submit", onClick: () => setSubmitted(true), variant: "primary" }),
         ]),
       ]),
     ]),
@@ -200,40 +151,59 @@ mount(App, document.getElementById("app"));
 
 ---
 
-## Building for Production
+## Todo app
 
-```bash
-npm run build
-```
+```js
+import { mount, Column, Row, Text, Button, TextField, useState } from "@chimuka_amel/lumina-ui";
 
-Vite outputs optimized static files to the `dist/` folder:
+const [todos, setTodos, subscribeTodos] = useState([]);
+const [input, setInput, subscribeInput] = useState("");
+const subscribed = new WeakSet();
 
-```text
-dist/
-├── index.html
-└── assets/
-    ├── index-abc123.js
-    └── index-def456.css
-```
+function bind(forceUpdate) {
+  if (subscribed.has(forceUpdate)) return;
+  subscribeTodos(forceUpdate);
+  subscribeInput(forceUpdate);
+  subscribed.add(forceUpdate);
+}
 
-Deploy the `dist/` folder to any static host:
+function App(forceUpdate) {
+  bind(forceUpdate);
 
-- Vercel
-- Netlify
-- GitHub Pages
-- Cloudflare Pages
-- Any S3 bucket
+  const add = () => {
+    if (!input().trim()) return;
+    setTodos([...todos(), { id: Date.now(), text: input(), done: false }]);
+    setInput("");
+  };
 
-```bash
-# Preview the build locally
-npm run preview
+  const toggle = (id) =>
+    setTodos(todos().map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+
+  return Column({ gap: 16, style: { padding: 48, maxWidth: 600, margin: "0 auto" } }, [
+    Text("Todos", { size: 32, weight: 900 }),
+    Row({ gap: 8 }, [
+      TextField({ placeholder: "Add a todo...", value: input(), onChange: setInput, style: { flex: 1 } }),
+      Button({ text: "Add", onClick: add, variant: "primary" }),
+    ]),
+    Column({ gap: 8 }, [
+      ...todos().map((todo) =>
+        Row({ key: todo.id, gap: 8, style: { alignItems: "center" } }, [
+          Button({ text: todo.done ? "✓" : "○", onClick: () => toggle(todo.id), variant: "text", style: { width: 40 } }),
+          Text(todo.text, {
+            style: todo.done ? { textDecoration: "line-through", color: "#9ca3af" } : {},
+          }),
+        ])
+      ),
+    ]),
+  ]);
+}
+
+mount(App, document.getElementById("app"));
 ```
 
 ---
 
-## Using More Widgets
-
-Import any widget from the LuminaUI package:
+## Available widgets
 
 ```js
 import {
@@ -274,141 +244,23 @@ import {
 
 ---
 
-## Example: Todo App
-
-```js
-// src/todo.js
-import { mount, Column, Row, Text, Button, TextField, Card, useState } from "@chimuka_amel/lumina-ui";
-
-const [todos, setTodos, subscribeTodos] = useState([]);
-const [input, setInput, subscribeInput] = useState("");
-const subscribed = new WeakSet();
-
-function bind(forceUpdate) {
-  if (subscribed.has(forceUpdate)) return;
-  subscribeTodos(forceUpdate);
-  subscribeInput(forceUpdate);
-  subscribed.add(forceUpdate);
-}
-
-function App(forceUpdate) {
-  bind(forceUpdate);
-
-  const addTodo = () => {
-    if (input().trim()) {
-      setTodos([...todos(), { id: Date.now(), text: input(), done: false }]);
-      setInput("");
-    }
-  };
-
-  const toggleTodo = (id) => {
-    setTodos(
-      todos().map((t) =>
-        t.id === id ? { ...t, done: !t.done } : t
-      )
-    );
-  };
-
-  return Column({ gap: 16, style: { padding: 48, maxWidth: 600, margin: "0 auto" } }, [
-    Text("Todos", { size: 32, weight: 900 }),
-    Row({ gap: 8 }, [
-      TextField({
-        placeholder: "Add a todo...",
-        value: input(),
-        onChange: setInput,
-        style: { flex: 1 },
-      }),
-      Button({ text: "Add", onClick: addTodo, variant: "primary" }),
-    ]),
-    Column({ gap: 8 }, [
-      ...todos().map((todo) =>
-        Row(
-          { key: todo.id, gap: 8, style: { alignItems: "center" } },
-          [
-            Button({
-              text: todo.done ? "✓" : "○",
-              onClick: () => toggleTodo(todo.id),
-              variant: "text",
-              style: { width: 40 },
-            }),
-            Text(todo.text, {
-              style: todo.done ? { textDecoration: "line-through", color: "#9ca3af" } : {},
-            }),
-          ]
-        )
-      ),
-    ]),
-  ]);
-}
-
-mount(App, document.getElementById("app"));
-```
-
----
-
-## Why Vite + LuminaUI?
-
-| Feature | What you get |
-|---------|--------------|
-| **Dev server** | Instant start, fast HMR |
-| **Build** | Optimized production bundles |
-| **No config** | Zero setup, just works |
-| **No dependencies** | LuminaUI brings zero, Vite brings tooling only |
-| **Deploy anywhere** | Static files, any host |
-| **ES modules** | Modern browser-native imports |
-
----
-
-## Troubleshooting
-
-### "Cannot find module '@chimuka_amel/lumina-ui'"
-
-Make sure you installed it:
-
-```bash
-npm install @chimuka_amel/lumina-ui
-```
-
-### Hot reload not working
-
-Vite's HMR works with LuminaUI because state updates trigger `forceUpdate()`. If something feels off, restart the dev server:
-
-```bash
-npm run dev
-```
-
-### Build size too large?
-
-LuminaUI itself is tiny (~150 KB). Vite's build minifies and treeshakes. Check the build report:
-
-```bash
-npm run build -- --report
-```
-
----
-
-## Deploy to Production
-
-### Vercel
-
-```bash
-npm i -g vercel
-vercel
-```
-
-### Netlify
+## Building for production
 
 ```bash
 npm run build
-# Drag and drop the dist/ folder to Netlify
+```
+
+Output goes to `dist/`. Deploy it anywhere that serves static files — Vercel, Netlify, Cloudflare Pages, GitHub Pages, an S3 bucket.
+
+```bash
+# Preview the production build locally
+npm run preview
 ```
 
 ### GitHub Pages
 
 ```json
-// package.json
 {
-  "homepage": "https://yourusername.github.io/my-app",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -423,7 +275,7 @@ npm run deploy
 
 ---
 
-## Full Package.json Example
+## package.json
 
 ```json
 {
@@ -447,32 +299,23 @@ npm run deploy
 
 ---
 
-## Learn More
+## Troubleshooting
 
-- [Vite Documentation](https://vitejs.dev)
-- [LuminaUI Widget Reference](#) (link to your full README)
+**"Cannot find module '@chimuka_amel/lumina-ui'"**
+```bash
+npm install @chimuka_amel/lumina-ui
+```
+
+**HMR not picking up changes**
+
+State updates trigger `forceUpdate()` so HMR works out of the box. If something feels off, just restart the dev server.
+
+**Build output too large?**
+
+LuminaUI is around 150 KB. Vite minifies and treeshakes automatically. Run `npm run build -- --report` to inspect the bundle.
 
 ---
 
 ## License
 
 MIT
-
----
-
-**Zero dependencies. Instant development. Pure JavaScript.** 🚀
-```
-
----
-
-This README is **production-ready** and covers:
-
-- Quick start with Vite
-- Minimal and complete examples
-- Building and deploying
-- Todo app example
-- Troubleshooting
-- Deployment guides
-- Package.json example
-
-Just drop this into your Vite project as `README.md` and you're good to go.
