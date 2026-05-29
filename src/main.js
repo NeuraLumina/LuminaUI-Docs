@@ -347,6 +347,138 @@ Dismissible({ onDismissed: archiveCard }, [
       w("IgnorePointer", "Lets pointer events pass through a subtree.", "ignoring"),
     ],
   },
+  {
+    id: "routing",
+    title: "Routing",
+    importPath: "@neuralumina/lumina-ui/widgets/routing",
+    summary:
+      "Lightweight browser-history routing with parameter matching, navigation links, and route views.",
+    example: `import { createRouter, Router, RouteView, Link, NavLink, Column, Row, Text } from "@neuralumina/lumina-ui";
+
+const router = createRouter({
+  routes: [
+    { path: "/", child: Text("Home") },
+    { path: "/products/:id", component: ({ params }) => Text("Product " + params.id) },
+    { path: "*", child: Text("Not found") },
+  ],
+});
+
+Column({ gap: 12 }, [
+  Row({ gap: 8 }, [
+    NavLink({ router, to: "/", label: "Home", exact: true }),
+    Link({ router, to: "/products/42", label: "Product" }),
+  ]),
+  Router({ router }),
+]);`,
+    widgets: [
+      w("Router", "Renders the matched route component.", "router"),
+      w("RouteView", "Alternative route renderer with transition support.", "router, transition"),
+      w("Link", "Anchor tag that navigates via the router.", "router, to, label"),
+      w("NavLink", "Link that highlights when its path is active.", "router, to, label, exact"),
+      w("createRouter", "Creates a router instance with route definitions.", "routes, notFound"),
+      w("defaultRouter", "Pre-initialized singleton router.", "routes"),
+      w("isRouteActive", "Checks if a given path matches the current location.", "router, path, exact"),
+      w("matchPath", "Matches a pathname against a route pattern.", "pattern, pathname"),
+      w("matchRoute", "Finds the first matching route in a routes array.", "pathname, routes"),
+    ],
+  },
+  {
+    id: "overlays",
+    title: "Overlays",
+    importPath: "@neuralumina/lumina-ui/widgets/overlay",
+    summary:
+      "Controlled overlay, popover, and menu widgets for dialogs, dropdowns, and anchored menus.",
+    example: `import { Overlay, PopupMenuButton, Popover, Padding, Column, Text, Heading } from "@neuralumina/lumina-ui";
+
+Overlay({ open: isOpen(), modal: true, onDismiss: close }, [
+  Padding({ padding: 20 }, [
+    Column({ gap: 12 }, [
+      Heading({ level: 3 }, "Quick action"),
+      Text("This content sits above a scrim."),
+    ]),
+  ]),
+]);`,
+    widgets: [
+      w("Overlay", "Renders children in a portal with optional modal scrim.", "open, modal, onDismiss, style"),
+      w("OverlayEntry", "Insert element directly into the overlay portal.", "child"),
+      w("Popover", "Anchored popover that opens relative to a trigger element.", "open, anchor, onDismiss, children"),
+      w("Menu", "Vertical list of menu items in a floating panel.", "open, onDismiss, children"),
+      w("MenuItem", "Individual clickable item inside a Menu.", "label, onClick, danger"),
+      w("MenuDivider", "Horizontal separator used inside menus.", ""),
+      w("PopupMenuButton", "Button that toggles a controlled anchored menu.", "open, onOpenChange, label, items, onSelect"),
+    ],
+  },
+  {
+    id: "data",
+    title: "Data",
+    importPath: "@neuralumina/lumina-ui/widgets/data",
+    summary:
+      "Tabular data display and pagination controls for structured datasets.",
+    example: `import { DataTable, Pagination, Column, Text } from "@neuralumina/lumina-ui";
+
+DataTable({
+  rows: products(),
+  sortBy: sortKey(),
+  sortDirection: sortDir(),
+  onSortChange: (key, dir) => { setSortKey(key); setSortDir(dir); },
+  columns: [
+    { key: "name", label: "Product", sortable: true },
+    { key: "stock", label: "Stock", align: "right" },
+  ],
+});`,
+    widgets: [
+      w("DataTable", "Renders a sortable table from rows and column definitions.", "rows, columns, sortBy, sortDirection, onSortChange"),
+      w("Pagination", "Page navigation control with page number display.", "page, pageSize, totalItems, onPageChange"),
+      w("paginationRange", "Utility that computes visible page numbers.", "current, total, siblings"),
+      w("sortRows", "Utility that sorts rows by key and direction.", "rows, key, direction"),
+    ],
+  },
+  {
+    id: "selection",
+    title: "Selection",
+    importPath: "@neuralumina/lumina-ui/widgets/selection",
+    summary:
+      "Combo box and autocomplete widgets for text input with option selection.",
+    example: `import { ComboBox, Autocomplete, Column } from "@neuralumina/lumina-ui";
+
+ComboBox({
+  value: city(),
+  inputValue: query(),
+  open: comboOpen(),
+  onInputChange: setQuery,
+  onOpenChange: setComboOpen,
+  onChange: (val, opt) => { setCity(val); setQuery(opt.label); },
+  options: [
+    { label: "Lusaka", value: "lusaka" },
+    { label: "Cape Town", value: "cape-town" },
+  ],
+});`,
+    widgets: [
+      w("ComboBox", "Controlled text input with a listbox of selectable options.", "value, inputValue, open, onInputChange, onOpenChange, onChange, options"),
+      w("Autocomplete", "ComboBox that filters options by input value.", "inputValue, onInputChange, onChange, options"),
+      w("AutoComplete", "Alias for Autocomplete.", "inputValue, onInputChange, onChange, options"),
+      w("filterOptions", "Utility that filters option list by a query string.", "options, query"),
+    ],
+  },
+  {
+    id: "devtools",
+    title: "DevTools",
+    importPath: "@neuralumina/lumina-ui/widgets/devtools",
+    summary:
+      "Runtime error inspection overlay that captures render, state, effect, event, and unhandled errors.",
+    example: `import { DevTools } from "@neuralumina/lumina-ui/widgets/devtools";
+import { errorBus } from "@neuralumina/lumina-ui";
+
+DevTools({ open: devToolsOpen(), onOpenChange: setDevToolsOpen, maxErrors: 50 });
+
+// Programmatic access:
+errorBus.subscribe((entry) => console.log(entry));
+errorBus.clear();
+errorBus.getEntries();`,
+    widgets: [
+      w("DevTools", "Floating error inspection panel with count badge and expandable stack traces.", "open, onOpenChange, maxErrors"),
+    ],
+  },
 ];
 
 const coreApis = [
@@ -358,7 +490,14 @@ const coreApis = [
   w("Fragment", "Creates a document fragment from children.", "children"),
   w("applyStyles", "Applies a style object to an existing DOM element.", "element, styles"),
   w("addClasses", "Adds one or more class names to an existing DOM element.", "element, ...classes"),
-  w("luminaTheme", "Shared colors, radius, shadow, and transition tokens.", "colors, radius, shadow, transition"),
+  w("luminaTheme", "CSS-variable-backed design tokens for colors, radius, shadow, and transition.", "colors, radius, shadow, transition"),
+  w("luminaDefaultTheme", "Raw default token values before CSS variable wrapping.", "colors, radius, shadow, transition"),
+  w("createTheme", "Merges overrides with the default theme to produce a custom token set.", "overrides"),
+  w("themeToCssVariables", "Converts a theme object into CSS custom property declarations.", "theme"),
+  w("GlobalTheme", "Applies theme tokens as CSS custom properties on :root.", "theme"),
+  w("ThemeProvider", "Wraps children with theme token application in a scoped container.", "theme, applySurface, children"),
+  w("ThemeScope", "Alias for ThemeProvider.", "theme"),
+  w("errorBus", "ErrorBus singleton that captures render, state, effect, event, and unhandled errors.", "capture, subscribe, clear, getEntries"),
 ];
 
 const totalWidgets = widgetGroups.reduce(
@@ -511,7 +650,10 @@ const importCode = `import {
 
 import { Column, Row } from "@neuralumina/lumina-ui/widgets/layout";
 import { Button } from "@neuralumina/lumina-ui/widgets/controls";
-import { createStore } from "@neuralumina/lumina-ui/core/state";`;
+import { createStore } from "@neuralumina/lumina-ui/core/state";
+import { createRouter, Router } from "@neuralumina/lumina-ui/widgets/routing";
+import { DataTable } from "@neuralumina/lumina-ui/widgets/data";
+import { DevTools } from "@neuralumina/lumina-ui/widgets/devtools";`;
 
 const compositionCode = `import {
   Card,

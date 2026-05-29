@@ -2,7 +2,7 @@
 
 Professional package documentation for `@neuralumina/lumina-ui`.
 
-Current documented package version: `0.1.3`
+Current documented package version: `0.1.4`
 
 LuminaUI is a lightweight, Flutter-inspired UI package for building browser
 interfaces with plain JavaScript, ES modules, and real DOM output. This Vite
@@ -20,7 +20,7 @@ For this project, the installed package resolves to:
 ```json
 {
   "dependencies": {
-    "@neuralumina/lumina-ui": "^0.1.3"
+    "@neuralumina/lumina-ui": "^0.1.4"
   }
 }
 ```
@@ -108,11 +108,18 @@ import { createStore } from "@neuralumina/lumina-ui/core/state";
 - `Fragment`
 - `applyStyles`
 - `addClasses`
+- `errorBus`
+- `createTheme`
 - `luminaTheme`
+- `luminaDefaultTheme`
+- `themeToCssVariables`
+- `GlobalTheme`
+- `ThemeProvider`
+- `ThemeScope`
 
 ## Full Widget Inventory
 
-The package currently documents 95 public widgets.
+The package currently documents 120 public widgets.
 
 ### Layout
 
@@ -170,6 +177,28 @@ The package currently documents 95 public widgets.
 `AbsorbPointer`, `Dismissible`, `Draggable`, `DragTarget`, `GestureDetector`,
 `IgnorePointer`
 
+### Routing
+
+`Router`, `RouteView`, `Link`, `NavLink`, `createRouter`, `defaultRouter`,
+`isRouteActive`, `matchPath`, `matchRoute`
+
+### Overlays
+
+`Overlay`, `OverlayEntry`, `Popover`, `Menu`, `MenuItem`, `MenuDivider`,
+`PopupMenuButton`
+
+### Data
+
+`DataTable`, `Pagination`, `paginationRange`, `sortRows`
+
+### Selection
+
+`ComboBox`, `Autocomplete`, `AutoComplete`, `filterOptions`
+
+### DevTools
+
+`DevTools`
+
 ## Local Development
 
 ```bash
@@ -195,6 +224,9 @@ deployed to any static host.
 - Provides syntax-highlighted JavaScript, Bash, and JSON snippets in the app.
 - Uses responsive grids, a small-device navigation drawer, and horizontally
   scrollable code blocks for smaller screens.
+- Injects global CSS reset (box-sizing, antialiasing, selection styles) on package import via `ensureGlobalStyle`.
+- Captures render, state, effect, event, and unhandled errors through the `ErrorBus` singleton.
+- Includes a `DevTools` widget for runtime error inspection with stack traces.
 
 ## License
 
