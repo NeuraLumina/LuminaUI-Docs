@@ -36,6 +36,7 @@ const baseNavItems = [
   { id: "mental-model", label: "Mental Model" },
   { id: "state", label: "State" },
   { id: "widgets", label: "Widgets" },
+  { id: "responsive", label: "Responsive" },
   { id: "imports", label: "Imports" },
   { id: "examples", label: "Examples" },
   { id: "patterns", label: "Patterns" },
@@ -58,6 +59,10 @@ const highlights = [
   {
     title: "Package-first API",
     body: "The top-level module exports core utilities, theme helpers, and every public widget family.",
+  },
+  {
+    title: "Responsive by default",
+    body: "Widgets adapt from small phones to desktop screens with fluid sizing, safe-area awareness, and touch-friendly targets — no extra CSS required.",
   },
 ];
 
@@ -259,11 +264,11 @@ Scaffold({
 });`,
     widgets: [
       w("AppBar", "Header bar with title, leading content, and actions.", "title, leading, actions, height"),
-      w("BottomNavigationBar", "Mobile-style bottom navigation grid.", "items, value, onChange, color"),
+      w("BottomNavigationBar", "Mobile-style bottom navigation grid with safe-area inset padding.", "items, value, onChange, color"),
       w("Drawer", "Fixed side drawer for app navigation.", "open, width, zIndex"),
       w("NavigationRail", "Vertical side navigation for desktop app shells.", "items, value, onChange, width"),
       w("Scaffold", "Application layout shell with appBar, body, drawer, and bottomNavigationBar.", "appBar, body, drawer, bottomNavigationBar, bodyStyle"),
-      w("TabBar", "Controlled tab list.", "tabs, value, onChange, color"),
+      w("TabBar", "Controlled tab list that scrolls horizontally when tabs overflow.", "tabs, value, onChange, color"),
       w("TabBarView", "Renders the active tab child.", "tabs, value"),
     ],
   },
@@ -304,7 +309,7 @@ Column({ gap: 8 }, [
 ]);`,
     widgets: [
       w("Text", "Typography primitive with semantic tag support.", "content, size, weight, align, color, lineHeight, maxLines, as"),
-      w("Heading", "Heading helper for h1 through h6 sizing.", "level, children"),
+      w("Heading", "Heading helper for h1 through h6 with fluid, viewport-scaled sizing.", "level, size, children"),
       w("Caption", "Small muted text helper.", "children, color, size"),
       w("DefaultTextStyle", "Applies inherited text styles to a subtree.", "size, weight, color, align, lineHeight"),
       w("RichText", "Renders styled spans inside one text container.", "spans, as, style"),
@@ -342,10 +347,10 @@ Dismissible({ onDismissed: archiveCard }, [
 ]);`,
     widgets: [
       w("AbsorbPointer", "Blocks pointer events while optionally dimming children.", "absorbing, cursor, dim"),
-      w("Dismissible", "Detects swipe or keyboard dismissal gestures.", "direction, onDismissed, threshold, radius"),
+      w("Dismissible", "Detects swipe or keyboard dismissal once movement passes the threshold.", "direction, onDismissed, threshold, radius"),
       w("Draggable", "Makes children draggable with optional transfer data.", "data, onDragStarted, onDragCompleted, width, height"),
       w("DragTarget", "Receives dragged data and controls acceptable drops.", "onAccept, onWillAccept, radius"),
-      w("GestureDetector", "Maps click, double click, long press, and pointer pan events.", "onTap, onDoubleTap, onLongPress, onPanStart, onPanUpdate, onPanEnd"),
+      w("GestureDetector", "Maps tap, double tap, long press, and drag-based pan events. Long press tolerates small touch jitter.", "onTap, onDoubleTap, onLongPress, onPanStart, onPanUpdate, onPanEnd, longPressDelay"),
       w("IgnorePointer", "Lets pointer events pass through a subtree.", "ignoring"),
     ],
   },
@@ -576,6 +581,12 @@ const navItems = baseNavItems.map((item) => {
       sectionId: "widgets",
       children: widgetNavChildren(group),
     })),
+    responsive: [
+      { id: "responsive-mobile", label: "Mobile essentials", sectionId: "responsive" },
+      { id: "responsive-fluid", label: "Fluid sizing", sectionId: "responsive" },
+      { id: "responsive-overflow", label: "Overflow guards", sectionId: "responsive" },
+      { id: "responsive-motion", label: "Motion & overrides", sectionId: "responsive" },
+    ],
     imports: widgetGroups.map((group) => ({
       id: groupAnchor(group),
       label: `${group.title} widgets`,
@@ -2007,6 +2018,88 @@ function PatternsSection() {
   });
 }
 
+const responsiveFluidCode = `import { Heading, Dialog, Card, Text } from "@neuralumina/lumina-ui";
+
+// Heading sizes are fluid: level 1 renders 24px on phones
+// and grows to 32px on desktop viewports.
+Heading({ level: 1 }, "Scales with the viewport");
+
+// Dialog and Card padding tighten automatically on narrow screens,
+// and Dialog height tracks the visible mobile viewport (dvh), so it
+// stays fully reachable with the address bar or keyboard open.
+Dialog({ open: settingsOpen(), onDismiss: closeSettings }, [
+  Card([Text("No breakpoints required.")]),
+]);`;
+
+const responsiveOverflowCode = `import { GridView, TabBar, Card, Text } from "@neuralumina/lumina-ui";
+
+// Grid columns never force horizontal overflow — a 200px minimum
+// collapses to the container width on screens narrower than one column.
+GridView({
+  items: products,
+  minColumnWidth: 200,
+  gap: 12,
+  itemBuilder: (product) => Card({ key: product.id }, [Text(product.name)]),
+});
+
+// TabBar scrolls sideways when its tabs no longer fit.
+TabBar({ tabs, value: activeTab(), onChange: setActiveTab });`;
+
+const responsiveOverrideCode = `// Every fluid default is a plain inline style you can override:
+Card({ padding: 24 });                      // fixed padding, no clamp
+Heading({ level: 1, size: 40 }, "Custom");  // fixed heading size
+
+// Only the mobile usability rules ship as CSS media queries
+// (16px field text under 640px, 44px touch targets on touch screens).`;
+
+function ResponsiveSection() {
+  return Section({
+    id: "responsive",
+    eyebrow: "Adaptive UI",
+    title: "Responsive from small phones to desktop screens.",
+    intro:
+      "Since v0.2.0 every widget ships with adaptive defaults: fluid type and spacing, dynamic-viewport sizing, safe-area awareness, and touch-friendly hit targets. You get sensible behavior on a 320px phone and a 4K desktop without writing media queries.",
+    children: [
+      Column({ id: "responsive-mobile", className: "anchor-target", gap: 10 }, [
+        Text("Mobile essentials", { as: "h3", size: 20, weight: 900 }),
+        Text(
+          "The defaults below are tuned for touch devices and small viewports and require no configuration.",
+          { color: "#5b6677", lineHeight: 1.65 },
+        ),
+        RawElement("ul", { className: "doc-list" }, [
+          RawElement("li", {}, ["Text fields render 16px text under 640px, which stops iOS Safari from zooming into focused inputs."]),
+          RawElement("li", {}, ["Buttons, menu items, combo box options, and pagination controls grow to 44px minimum hit targets on touch screens; Switch gains an invisible tap halo around its 24px track."]),
+          RawElement("li", {}, ["SnackBar, BottomNavigationBar, and DevTools respect safe-area insets, clearing the iPhone home indicator and notch."]),
+        ]),
+      ]),
+      Column({ id: "responsive-fluid", className: "anchor-target", gap: 10 }, [
+        Text("Fluid sizing", { as: "h3", size: 20, weight: 900 }),
+        Text(
+          "Headings, dialog and card padding, and the AppBar scale continuously with the viewport using CSS clamp() and min(). Dialogs, overlays, and combo box lists cap their height with dynamic viewport units so they never hide behind mobile browser chrome.",
+          { color: "#5b6677", lineHeight: 1.65 },
+        ),
+        CodeBlock(responsiveFluidCode),
+      ]),
+      Column({ id: "responsive-overflow", className: "anchor-target", gap: 10 }, [
+        Text("Overflow guards", { as: "h3", size: 20, weight: 900 }),
+        Text(
+          "Images and buttons never exceed their container, popovers clamp to the viewport, DataTable scrolls with touch momentum, GridView columns collapse instead of overflowing, and TabBar switches to horizontal scrolling when space runs out.",
+          { color: "#5b6677", lineHeight: 1.65 },
+        ),
+        CodeBlock(responsiveOverflowCode),
+      ]),
+      Column({ id: "responsive-motion", className: "anchor-target", gap: 10 }, [
+        Text("Motion & overrides", { as: "h3", size: 20, weight: 900 }),
+        Text(
+          "The global stylesheet honors prefers-reduced-motion by disabling LuminaUI animations and transitions for users who request it, and disables mobile text auto-inflation. Fluid defaults are ordinary inline styles, so passing your own style or size props always wins.",
+          { color: "#5b6677", lineHeight: 1.65 },
+        ),
+        CodeBlock(responsiveOverrideCode),
+      ]),
+    ],
+  });
+}
+
 function DocsContent() {
   return RawElement("main", { className: "docs-content" }, [
     OverviewSection(),
@@ -2016,6 +2109,7 @@ function DocsContent() {
     MentalModelSection(),
     StateSection(),
     WidgetsSection(),
+    ResponsiveSection(),
     ImportsSection(),
     ExamplesSection(),
     PatternsSection(),
