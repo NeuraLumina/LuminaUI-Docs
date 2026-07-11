@@ -2,7 +2,7 @@
 
 Professional package documentation for `@neuralumina/lumina-ui`.
 
-Current documented package version: `0.1.4`
+Current documented package version: `0.2.0`
 
 LuminaUI is a lightweight, Flutter-inspired UI package for building browser
 interfaces with plain JavaScript, ES modules, and real DOM output. This Vite
@@ -20,7 +20,7 @@ For this project, the installed package resolves to:
 ```json
 {
   "dependencies": {
-    "@neuralumina/lumina-ui": "^0.1.4"
+    "@neuralumina/lumina-ui": "^0.2.0"
   }
 }
 ```
@@ -230,4 +230,5 @@ deployed to any static host.
 
 ## License
 
-The documented package is licensed as `Apache-2.0`.
+This project is licensed under the [Apache License 2.0](./LICENSE). The
+documented package, `@neuralumina/lumina-ui`, is also licensed as `Apache-2.0`.
