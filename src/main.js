@@ -1686,7 +1686,7 @@ function TopBar() {
             variant: "secondary",
           }),
           LinkButton({
-            href: "https://github.com/AmelCMM/LuminaUI",
+            href: "https://github.com/NeuraLumina/LuminaUI",
             label: "GitHub",
             variant: "primary",
           }),

@@ -3,10 +3,10 @@ import { Column, Container, Row, Text, Card, Image, Divider, Button } from "@neu
 // Team members data
 const teamMembers = [
   {
-    name: "Chimuka Mukwenya (AmelCMM)",
+    name: "Neura Lumina",
     role: "Creator & Lead Developer",
     bio: "Built LuminaUI from scratch — 15k LOC, zero dependencies, pure JavaScript.",
-    avatar: "https://ui-avatars.com/api/?name=AmelCMM&background=0f8f67&color=fff&bold=true",
+    avatar: "https://ui-avatars.com/api/?name=Neura+Lumina&background=0f8f67&color=fff&bold=true",
   },
   {
     name: "Lumina Core",
@@ -72,7 +72,7 @@ export function About() {
           Button({
             text: "View on GitHub",
             variant: "primary",
-            onClick: () => window.open("https://github.com/AmelCMM/luminaUI", "_blank"),
+            onClick: () => window.open("https://github.com/NeuraLumina/luminaUI", "_blank"),
             style: { marginTop: 8, width: "fit-content" },
           }),
         ]),
@@ -199,7 +199,7 @@ export function About() {
             Button({
               text: "GitHub",
               variant: "secondary",
-              onClick: () => window.open("https://github.com/AmelCMM/luminaUI", "_blank"),
+              onClick: () => window.open("https://github.com/NeuraLumina/luminaUI", "_blank"),
               style: { backgroundColor: "transparent", borderColor: "white", color: "white" },
             }),
           ]),
